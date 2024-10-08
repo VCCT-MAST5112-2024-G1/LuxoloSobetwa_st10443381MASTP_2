@@ -13,27 +13,20 @@ export default function HomeScreen() {
     const menuItems = route.params?.menuItems || [];
     const navigation = useNavigation<HomeScreenProp>();
 
-    // Sample data (if no items are passed through navigation)
-    const sampleMenu = [
-        { courseType: 'Starter', DishName: 'Caesar Salad', description: 'Fresh romaine lettuce with Caesar dressing', price: 5.99 },
-        { courseType: 'Main Course', DishName: 'Grilled Salmon', description: 'Salmon fillet with garlic butter', price: 12.99 },
-        { courseType: 'Dessert', DishName: 'Chocolate Cake', description: 'Rich chocolate cake with ganache', price: 6.99 },
-    ];
-
-    // Predefined menu items
+    // Predefined menu with one item per course
     const predefinedMenu = [
-        { courseType: 'Starter', DishName: 'Sushi', description: 'Wasabi', price: 8.99 },
-        { courseType: 'Main Course', DishName: 'Ribs and Chips', description: 'Crunchy', price: 14.99 },
-        { courseType: 'Dessert', DishName: 'Ice Cream and Biscuits', description: 'Crunchy', price: 4.99 },
+        { courseType: 'Starter', DishName: 'Bruschetta', description: 'Toasted baguette with fresh tomatoes and basil', price: 7.50 },
+        { courseType: 'Main Course', DishName: 'Beef Lasagna', description: 'Layered pasta with beef and cheese', price: 15.99 },
+        { courseType: 'Dessert', DishName: 'Tiramisu', description: 'Classic Italian dessert with coffee and mascarpone', price: 8.99 },
     ];
 
     // Filter to get one item per course from menuItems
     const uniqueCourses = ['Starter', 'Main Course', 'Dessert'];
     const filteredMenu = uniqueCourses.map(course =>
-        menuItems.find((item: { courseType: string; }) => item.courseType === course) || sampleMenu.find(item => item.courseType === course)
-    );
+        menuItems.find((item: { courseType: string; }) => item.courseType === course)
+    ).filter(Boolean); // Filters out any undefined values
 
-    // Concatenate the predefined menu with the filtered menu
+    // Combine predefined menu and filtered menu items
     const combinedMenu = [...predefinedMenu, ...filteredMenu];
 
     const handleFilterPress = () => {
@@ -57,8 +50,8 @@ export default function HomeScreen() {
             <FlatList
                 data={combinedMenu}
                 keyExtractor={(item, index) => `${item.courseType}-${index}`}
-                renderItem={({ item }) => (
-                    <View style={styles.menuDetails}>
+                renderItem={({ item, index }) => (
+                    <View style={[styles.menuDetails, index < predefinedMenu.length ? styles.predefinedMenu : {}]}>
                         <Text style={styles.menuText}>
                             Dish Name: <Text style={styles.boldText}>{item.DishName}</Text>
                         </Text>
@@ -75,6 +68,9 @@ export default function HomeScreen() {
                 )}
             />
 
+            {/* Display total number of meals added */}
+            <Text style={styles.totalMealsText}>Total Meals Added: {menuItems.length}</Text>
+
             <Button
                 title="Add Menu"
                 onPress={() => navigation.navigate('AddMenu')}
@@ -87,11 +83,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        backgroundColor: '#f0f8ff', // Light color background
+        backgroundColor: '#f0f8ff',
     },
     image: {
-        width: 150, // Smaller width for the image
-        height: 100, // Smaller height for the image
+        width: 150,
+        height: 100,
         marginBottom: 16,
         borderRadius: 10,
         alignSelf: 'center',
@@ -100,14 +96,14 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         marginBottom: 16,
-        color: '#2f4f4f', // Darker color for the title
+        color: '#2f4f4f',
         textAlign: 'center',
     },
     filterButton: {
         position: 'absolute',
-        top: 40, // Adjust based on screen header
+        top: 40,
         right: 16,
-        backgroundColor: '#FF6347', // Button background color
+        backgroundColor: '#FF6347',
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 8,
@@ -139,6 +135,11 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 2,
     },
+    predefinedMenu: {
+        backgroundColor: '#ffe4b5',
+        padding: 8,
+        marginBottom: 12,
+    },
     menuText: {
         fontSize: 18,
         color: '#333',
@@ -148,5 +149,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 18,
         color: '#000',
+    },
+    totalMealsText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#2f4f4f',
+        textAlign: 'center',
+        marginVertical: 16,
     },
 });
