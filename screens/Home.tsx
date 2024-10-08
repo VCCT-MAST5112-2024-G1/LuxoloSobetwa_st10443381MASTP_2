@@ -148,8 +148,9 @@ const styles = StyleSheet.create({
     },
     predefinedMenu: {
         backgroundColor: '#ffe4b5',
-        padding: 8,
-        marginBottom: 12,
+        padding: 6, // Smaller padding for predefined list items
+        marginBottom: 8, // Slightly smaller margin
+        borderRadius: 6,
     },
     menuText: {
         fontSize: 18,
