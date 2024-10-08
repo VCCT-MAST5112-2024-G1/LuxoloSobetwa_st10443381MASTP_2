@@ -85,7 +85,7 @@ export default function AddMenuItemScreen() {
         </View>
     );
 }
-// css elements
+//
 const styles = StyleSheet.create({
     container: {
         flex: 1,
