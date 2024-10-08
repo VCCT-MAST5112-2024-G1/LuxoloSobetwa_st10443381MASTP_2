@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     picker: {
         height: 50,
         borderWidth: 2,
-        borderColor: '#ffa07a', // Lighter orange border for the picker
+        borderColor: '#ffa07a', // changed the colour to light orange
         borderRadius: 5, // Rounded corners for the picker
         justifyContent: 'center',
         alignItems: 'center',
