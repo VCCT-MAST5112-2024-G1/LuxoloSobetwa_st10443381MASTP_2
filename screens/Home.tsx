@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, FlatList, StyleSheet, Image } from 'react-native';
+import { View, Text, Button, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { RouteProp, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from './RootStackParams';
@@ -9,47 +9,71 @@ type HomeScreenProp = StackNavigationProp<RootStackParamList, 'Home'>;
 type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>;
 
 export default function HomeScreen() {
-
     const route = useRoute<HomeScreenRouteProp>();
-
-    // Get the menu items from the route parameters
     const menuItems = route.params?.menuItems || [];
-
     const navigation = useNavigation<HomeScreenProp>();
+
+    // Sample data (if no items are passed through navigation)
+    const sampleMenu = [
+        { courseType: 'Starter', DishName: 'Caesar Salad', description: 'Fresh romaine lettuce with Caesar dressing', price: 5.99 },
+        { courseType: 'Main Course', DishName: 'Grilled Salmon', description: 'Salmon fillet with garlic butter', price: 12.99 },
+        { courseType: 'Dessert', DishName: 'Chocolate Cake', description: 'Rich chocolate cake with ganache', price: 6.99 },
+    ];
+
+    // Predefined menu items
+    const predefinedMenu = [
+        { courseType: 'Starter', DishName: 'Sushi', description: 'Wasabi', price: 8.99 },
+        { courseType: 'Main Course', DishName: 'Ribs and Chips', description: 'Crunchy', price: 14.99 },
+        { courseType: 'Dessert', DishName: 'Ice Cream and Biscuits', description: 'Crunchy', price: 4.99 },
+    ];
+
+    // Filter to get one item per course from menuItems
+    const uniqueCourses = ['Starter', 'Main Course', 'Dessert'];
+    const filteredMenu = uniqueCourses.map(course =>
+        menuItems.find((item: { courseType: string; }) => item.courseType === course) || sampleMenu.find(item => item.courseType === course)
+    );
+
+    // Concatenate the predefined menu with the filtered menu
+    const combinedMenu = [...predefinedMenu, ...filteredMenu];
+
+    const handleFilterPress = () => {
+        alert('Filter button pressed');
+    };
 
     return (
         <View style={styles.container}>
             <Image 
-                source={require('./image/cooking.png')} // Use the local image
+                source={require('./image/cooking.png')}
                 style={styles.image}
             />
-            <Text style={styles.title}>Added Menu</Text>
+            <Text style={styles.title}>Menu</Text>
 
-            {/* Display the total number of menu items */}
-            <Text style={styles.menuCount}>Total Added Menu Items: {menuItems.length}</Text>
+            {/* Filter Button */}
+            <TouchableOpacity style={styles.filterButton} onPress={handleFilterPress}>
+                <Text style={styles.filterButtonText}>Filter</Text>
+            </TouchableOpacity>
 
+            {/* Display each course */}
             <FlatList
-    data={menuItems}
-    keyExtractor={(item, index) => `${item.DishName}-${index}`}
-    renderItem={({ item }) => (
-        <View style={styles.menuDetails}>
-            <Text style={styles.menuText}>
-                Dish Name: <Text style={styles.boldText}>{item.DishName}</Text>
-            </Text>
-            <Text style={styles.menuText}>
-                Description: <Text style={styles.boldText}>{item.description}</Text>
-            </Text>
-            <Text style={styles.menuText}>
-                Price: <Text style={styles.boldText}>${item.price.toFixed(2)}</Text>
-            </Text>
-            <Text style={styles.menuText}>
-                Course Type: <Text style={styles.boldText}>{item.courseType}</Text>
-            </Text>
-        </View>
-    )}
-/>
-
-
+                data={combinedMenu}
+                keyExtractor={(item, index) => `${item.courseType}-${index}`}
+                renderItem={({ item }) => (
+                    <View style={styles.menuDetails}>
+                        <Text style={styles.menuText}>
+                            Dish Name: <Text style={styles.boldText}>{item.DishName}</Text>
+                        </Text>
+                        <Text style={styles.menuText}>
+                            Description: <Text style={styles.boldText}>{item.description}</Text>
+                        </Text>
+                        <Text style={styles.menuText}>
+                            Price: <Text style={styles.boldText}>${item.price.toFixed(2)}</Text>
+                        </Text>
+                        <Text style={styles.menuText}>
+                            Course Type: <Text style={styles.boldText}>{item.courseType}</Text>
+                        </Text>
+                    </View>
+                )}
+            />
 
             <Button
                 title="Add Menu"
@@ -59,7 +83,6 @@ export default function HomeScreen() {
     );
 }
 
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -67,27 +90,46 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f8ff', // Light color background
     },
     image: {
-        width: '100%',
-        height: 200, // Adjust the height as necessary
+        width: 150, // Smaller width for the image
+        height: 100, // Smaller height for the image
         marginBottom: 16,
-        borderRadius: 10, // Optional: Rounded corners for the image
-        resizeMode: 'cover', // Ensure the image covers the area without distortion
+        borderRadius: 10,
+        alignSelf: 'center',
+        resizeMode: 'cover',
     },
     title: {
         fontSize: 24,
         marginBottom: 16,
         color: '#2f4f4f', // Darker color for the title
+        textAlign: 'center',
     },
-    menuCount: {
-        fontSize: 18,
-        marginBottom: 16,
-        color: 'green',
+    filterButton: {
+        position: 'absolute',
+        top: 40, // Adjust based on screen header
+        right: 16,
+        backgroundColor: '#FF6347', // Button background color
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        elevation: 4,
+    },
+    filterButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
     },
     menuDetails: {
         marginBottom: 24,
         padding: 12,
-        backgroundColor: '#fff', // White background for menu details
-        borderRadius: 8, // Rounded corners
+        backgroundColor: '#fff',
+        borderRadius: 8,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -95,16 +137,16 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 2, // For Android shadow
+        elevation: 2,
     },
     menuText: {
-        fontSize: 18, // Larger font size for the menu text
-        color: '#333', // Darker color for readability
+        fontSize: 18,
+        color: '#333',
         marginBottom: 8,
     },
     boldText: {
         fontWeight: 'bold',
-        fontSize: 20, // Bigger font size for bold text
+        fontSize: 18,
         color: '#000',
     },
 });
