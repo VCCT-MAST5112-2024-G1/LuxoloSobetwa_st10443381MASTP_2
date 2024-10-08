@@ -24,10 +24,13 @@ export default function HomeScreen() {
     const uniqueCourses = ['Starter', 'Main Course', 'Dessert'];
     const filteredMenu = uniqueCourses.map(course =>
         menuItems.find((item: { courseType: string; }) => item.courseType === course)
-    ).filter(Boolean); // Filters out any undefined values
+    ).filter(Boolean);
 
     // Combine predefined menu and filtered menu items
     const combinedMenu = [...predefinedMenu, ...filteredMenu];
+
+    // Calculate total number of items including both predefined and additional menu items
+    const totalMenuItems = combinedMenu.length;
 
     const handleFilterPress = () => {
         alert('Filter button pressed');
@@ -39,6 +42,10 @@ export default function HomeScreen() {
                 source={require('./image/cooking.png')}
                 style={styles.image}
             />
+
+            {/* Total number of menu items */}
+            <Text style={styles.totalItemsText}>Total Menu Items: {totalMenuItems}</Text>
+
             <Text style={styles.title}>Menu</Text>
 
             {/* Filter Button */}
@@ -68,9 +75,6 @@ export default function HomeScreen() {
                 )}
             />
 
-            {/* Display total number of meals added */}
-            <Text style={styles.totalMealsText}>Total Meals Added: {menuItems.length}</Text>
-
             <Button
                 title="Add Menu"
                 onPress={() => navigation.navigate('AddMenu')}
@@ -88,10 +92,17 @@ const styles = StyleSheet.create({
     image: {
         width: 150,
         height: 100,
-        marginBottom: 16,
+        marginBottom: 8,
         borderRadius: 10,
         alignSelf: 'center',
         resizeMode: 'cover',
+    },
+    totalItemsText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#2f4f4f',
+        textAlign: 'center',
+        marginBottom: 16,
     },
     title: {
         fontSize: 24,
@@ -149,12 +160,5 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 18,
         color: '#000',
-    },
-    totalMealsText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#2f4f4f',
-        textAlign: 'center',
-        marginVertical: 16,
     },
 });
