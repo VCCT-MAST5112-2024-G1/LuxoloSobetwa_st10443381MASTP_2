@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, Modal } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, Modal, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from './RootStackParams';
@@ -7,36 +7,64 @@ import { RootStackParamList } from './RootStackParams';
 type AddMenuItemProp = StackNavigationProp<RootStackParamList, 'AddMenuItem'>;
 
 export default function AddMenuItemScreen() {
-    const [DishName, setDishName] = useState(''); // Updated variable name
+    const [DishName, setDishName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState<number>(0);
     const [courseType, setCourseType] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
+    const [menuItems, setMenuItems] = useState<Array<{ DishName: string; description: string; price: number; courseType: string }>>([]);
 
     const navigation = useNavigation<AddMenuItemProp>();
 
-    // Handle adding menu item and navigating to Home
-    const handleAddMenuItem = (currentMenu: Array<{ DishName: string; description: string; price: number; courseType: string }>) => {
+    // Handle adding menu item
+    const handleAddMenuItem = () => {
         const newMenuItem = { DishName, description, price, courseType };
-        const updatedMenu = [...currentMenu, newMenuItem];
-
-        // Navigate to Home and pass the updated menu array
-        navigation.navigate('Home', { menuItems: updatedMenu });
+        const updatedMenu = [...menuItems, newMenuItem];
+        setMenuItems(updatedMenu);
+        setDishName('');
+        setDescription('');
+        setPrice(0);
+        setCourseType('');
+        setModalVisible(false);
     };
+
+    // Handle deleting a menu item
+    const handleDeleteMenuItem = (index: number) => {
+        const updatedMenuItems = [...menuItems];
+        updatedMenuItems.splice(index, 1); // Remove item at the given index
+        setMenuItems(updatedMenuItems);
+    };
+
+    const renderMenuItem = ({ item, index }: { item: { DishName: string; description: string; price: number; courseType: string }; index: number }) => (
+        <View style={styles.menuItem}>
+            <Text style={styles.menuText}><Text style={styles.boldText}>Dish Name:</Text> {item.DishName}</Text>
+            <Text style={styles.menuText}><Text style={styles.boldText}>Description:</Text> {item.description}</Text>
+            <Text style={styles.menuText}><Text style={styles.boldText}>Price:</Text> ${item.price.toFixed(2)}</Text>
+            <Text style={styles.menuText}><Text style={styles.boldText}>Course Type:</Text> {item.courseType}</Text>
+
+            {/* Delete Button */}
+            <TouchableOpacity onPress={() => handleDeleteMenuItem(index)} style={styles.deleteButton}>
+                <Text style={styles.deleteButtonText}>Delete</Text>
+            </TouchableOpacity>
+        </View>
+    );
 
     return (
         <View style={styles.container}>
+            {/* Input fields for new menu item */}
             <Text style={styles.label}>Dish Name:</Text>
             <TextInput
                 placeholder="Dish Name"
-                onChangeText={newText => setDishName(newText)} // Updated function
+                value={DishName}
+                onChangeText={setDishName}
                 style={styles.input}
             />
 
             <Text style={styles.label}>Description:</Text>
             <TextInput
                 placeholder="Description"
-                onChangeText={newText => setDescription(newText)}
+                value={description}
+                onChangeText={setDescription}
                 style={styles.input}
                 multiline
             />
@@ -44,7 +72,8 @@ export default function AddMenuItemScreen() {
             <Text style={styles.label}>Price:</Text>
             <TextInput
                 placeholder="Price"
-                onChangeText={newText => setPrice(parseFloat(newText))}
+                value={price.toString()}
+                onChangeText={(text) => setPrice(parseFloat(text))}
                 style={styles.input}
                 keyboardType="numeric"
             />
@@ -75,17 +104,20 @@ export default function AddMenuItemScreen() {
                 </View>
             </Modal>
 
-            <Button
-                title="Add Menu Item"
-                onPress={() => {
-                    const currentMenu = navigation.getState().routes.find(r => r.name === 'Home')?.params?.menuItems || [];
-                    handleAddMenuItem(currentMenu);
-                }}
+            <Button title="Add Menu Item" onPress={handleAddMenuItem} />
+
+            {/* Display the current menu */}
+            <Text style={styles.label}>Current Menu:</Text>
+            <FlatList
+                data={menuItems}
+                keyExtractor={(item, index) => `${item.DishName}-${index}`}
+                renderItem={renderMenuItem}
+                ListEmptyComponent={<Text style={styles.noItemsText}>No menu items available</Text>}
             />
         </View>
     );
 }
-//
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -144,5 +176,36 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginVertical: 10,
+    },
+    menuItem: {
+        backgroundColor: '#f8f8f8',
+        padding: 10,
+        marginVertical: 8,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#ddd',
+    },
+    menuText: {
+        fontSize: 16,
+        marginBottom: 5,
+    },
+    boldText: {
+        fontWeight: 'bold',
+    },
+    noItemsText: {
+        fontSize: 18,
+        fontStyle: 'italic',
+        color: '#888',
+    },
+    deleteButton: {
+        marginTop: 10,
+        backgroundColor: '#FF6347',
+        padding: 8,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    deleteButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
 });
