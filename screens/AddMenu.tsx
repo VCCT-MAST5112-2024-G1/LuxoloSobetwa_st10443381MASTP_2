@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#b2e0f8', // Lighter blue background
     },
     input: {
+        
         borderWidth: 2,
         borderColor: '#ffa07a', // Lighter orange border
         padding: 12,
