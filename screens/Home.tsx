@@ -19,10 +19,8 @@ export default function HomeScreen({ navigation }) {
 
     const combinedMenu = [...predefinedMenu, ...additionalMenu];
 
-    // Calculate the overall average price
     const averagePrice = combinedMenu.reduce((total, item) => total + item.price, 0) / combinedMenu.length;
 
-    // Calculate the average price by course
     const courseTypes = ['Starter', 'Main Course', 'Dessert'];
     const averagePriceByCourse = courseTypes.map((courseType) => {
         const items = combinedMenu.filter((item) => item.courseType === courseType);
@@ -30,33 +28,30 @@ export default function HomeScreen({ navigation }) {
         return { courseType, averagePrice: avgPrice };
     });
 
-    // Filter menu based on selected course type
     const filteredMenu = selectedFilter
         ? combinedMenu.filter((item) => item.courseType === selectedFilter)
         : combinedMenu;
 
     const handleFilterToggle = () => {
-        setShowFilters(!showFilters); // Toggle the filter section
-        setSelectedFilter(null); // Reset filter when opening filter section
+        setShowFilters(!showFilters);
+        setSelectedFilter(null);
     };
 
     const handleFilterSelect = (courseType) => {
-        setSelectedFilter(courseType); // Set selected filter
+        setSelectedFilter(courseType);
     };
 
     const handleAddMenuPress = () => {
-        navigation.navigate('AddMenu'); // Navigate to the "Add Menu" screen
+        navigation.navigate('AddMenu');
     };
 
     return (
         <View style={styles.container}>
-            {/* Header Image */}
             <Image
                 source={require('./image/cooking.png')}
                 style={styles.image}
             />
 
-            {/* Total Items and Average Price */}
             <Text style={styles.totalItemsText}>Total Menu Items: {combinedMenu.length}</Text>
 
             {!showFilters && (
@@ -74,12 +69,10 @@ export default function HomeScreen({ navigation }) {
                 </>
             )}
 
-            {/* Filter Button */}
             <TouchableOpacity style={styles.filterButton} onPress={handleFilterToggle}>
                 <Text style={styles.filterButtonText}>{showFilters ? 'Close Filters' : 'Filter'}</Text>
             </TouchableOpacity>
 
-            {/* Filter Section */}
             {showFilters && (
                 <View style={styles.filterSection}>
                     <Text style={styles.filterTitle}>Filter by Course</Text>
@@ -123,12 +116,18 @@ export default function HomeScreen({ navigation }) {
                 </View>
             )}
 
-            {/* Display Menu Items */}
             <FlatList
                 data={filteredMenu}
                 keyExtractor={(item, index) => `${item.courseType}-${index}`}
                 renderItem={({ item }) => (
-                    <View style={styles.menuDetails}>
+                    <View
+                        style={[
+                            styles.menuDetails,
+                            selectedFilter
+                                ? styles.filteredMenu // Apply green background to filtered menu
+                                : styles.originalMenu, // White background for original menu
+                        ]}
+                    >
                         <Text style={styles.menuText}>
                             Dish Name: <Text style={styles.boldText}>{item.DishName}</Text>
                         </Text>
@@ -146,7 +145,6 @@ export default function HomeScreen({ navigation }) {
                 ListEmptyComponent={<Text style={styles.noItemsText}>No items available</Text>}
             />
 
-            {/* Add Menu Button */}
             <View style={styles.addMenuButtonContainer}>
                 <Button title="Add Menu" onPress={handleAddMenuPress} color="#FF6347" />
             </View>
@@ -240,10 +238,13 @@ const styles = StyleSheet.create({
     menuDetails: {
         marginBottom: 16,
         padding: 12,
-        backgroundColor: '#ffe4b5',
-        borderColor: '#ff7f50',
-        borderWidth: 2,
         borderRadius: 8,
+    },
+    originalMenu: {
+        backgroundColor: '#ffffff', // White for original menu
+    },
+    filteredMenu: {
+        backgroundColor: '#e6ffe6', // Light green for filtered menu
     },
     menuText: {
         fontSize: 16,
