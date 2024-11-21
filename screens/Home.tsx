@@ -19,9 +19,16 @@ export default function HomeScreen({ navigation }) {
 
     const combinedMenu = [...predefinedMenu, ...additionalMenu];
 
-    // Calculate the average price
-    const averagePrice =
-        combinedMenu.reduce((total, item) => total + item.price, 0) / combinedMenu.length;
+    // Calculate the overall average price
+    const averagePrice = combinedMenu.reduce((total, item) => total + item.price, 0) / combinedMenu.length;
+
+    // Calculate the average price by course
+    const courseTypes = ['Starter', 'Main Course', 'Dessert'];
+    const averagePriceByCourse = courseTypes.map((courseType) => {
+        const items = combinedMenu.filter((item) => item.courseType === courseType);
+        const avgPrice = items.reduce((total, item) => total + item.price, 0) / items.length || 0;
+        return { courseType, averagePrice: avgPrice };
+    });
 
     // Filter menu based on selected course type
     const filteredMenu = selectedFilter
@@ -51,9 +58,21 @@ export default function HomeScreen({ navigation }) {
 
             {/* Total Items and Average Price */}
             <Text style={styles.totalItemsText}>Total Menu Items: {combinedMenu.length}</Text>
-            <Text style={styles.averagePriceText}>
-                Average Price: ${averagePrice.toFixed(2)}
-            </Text>
+
+            {!showFilters && (
+                <>
+                    <Text style={styles.averagePriceText}>
+                        Overall Average Price: ${averagePrice.toFixed(2)}
+                    </Text>
+                    <View style={styles.averagePriceByCourse}>
+                        {averagePriceByCourse.map(({ courseType, averagePrice }) => (
+                            <Text key={courseType} style={styles.averagePriceCourseText}>
+                                {courseType} Average: ${averagePrice.toFixed(2)}
+                            </Text>
+                        ))}
+                    </View>
+                </>
+            )}
 
             {/* Filter Button */}
             <TouchableOpacity style={styles.filterButton} onPress={handleFilterToggle}>
@@ -65,7 +84,7 @@ export default function HomeScreen({ navigation }) {
                 <View style={styles.filterSection}>
                     <Text style={styles.filterTitle}>Filter by Course</Text>
                     <View style={styles.filterContainer}>
-                        {['Starter', 'Main Course', 'Dessert'].map((courseType) => (
+                        {courseTypes.map((courseType) => (
                             <TouchableOpacity
                                 key={courseType}
                                 style={[
@@ -163,6 +182,15 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 16,
     },
+    averagePriceByCourse: {
+        marginBottom: 16,
+        paddingHorizontal: 16,
+    },
+    averagePriceCourseText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#4b0082',
+    },
     filterButton: {
         alignSelf: 'flex-end',
         marginBottom: 8,
@@ -212,16 +240,10 @@ const styles = StyleSheet.create({
     menuDetails: {
         marginBottom: 16,
         padding: 12,
-        backgroundColor: '#fff',
+        backgroundColor: '#ffe4b5',
+        borderColor: '#ff7f50',
+        borderWidth: 2,
         borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
     },
     menuText: {
         fontSize: 16,
